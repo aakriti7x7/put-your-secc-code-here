@@ -5,7 +5,6 @@
 #define fo(i,n) for(i=0;i<n;i++)
 using namespace std;
 lli t,i,l,n,k,j,m,p,ans=0;
-// vector<vector<lli>> a(26,vector<lli>(1000000+2));
 string s;
 int main()
 {
