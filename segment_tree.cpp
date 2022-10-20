@@ -89,8 +89,6 @@ int main(){
   freopen("Output.txt","w",stdout);
   #endif
 
-  // int t = 1; cin >> t; for(int i = 1; i <= t; ++i)
-
   solve();
 
   return 0;
