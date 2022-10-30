@@ -1,0 +1,213 @@
+// connect ropes to minimise cost, similar to huffman coding take 2 2 smaller smaller and merge
+
+// merge k sorted arrays
+// add k elemlents from first of every vector, then choose min and add it's second one
+// Logic: suppose you choose any element from a group then either next elemenet would be minimum or the remaining k-1 would give minimum and this would be true for all cases
+vector<int> Solution::solve(vector<vector<int>> &A)
+{
+  priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+  for (int i = 0; i < A.size(); i++)
+    pq.push({A[i][0], i * A[0].size()});
+  vector<int> ans;
+  while (!pq.empty())
+  {
+    ans.push_back(pq.top().first);
+    int ind = pq.top().second;
+    int a = ind % (A[0].size());
+    int b = ind / A[0].size();
+    pq.pop();
+    if (a + 1 != A[0].size())
+    {
+      pq.push({A[b][a + 1], ind + 1});
+    }
+  }
+  return ans;
+}
+
+// merge k sorted lists by priority queue
+class Solution
+{
+public:
+  ListNode *mergeKLists(vector<ListNode *> &lists)
+  {
+    if (lists.size() == 0)
+      return NULL;
+    if (lists.size() == 1)
+      return lists[0];
+    priority_queue<pair<int, ListNode *>, vector<pair<int, ListNode *>>, greater<pair<int, ListNode *>>> pq;
+    for (int i = 0; i < lists.size(); i++)
+    {
+      if (lists[i] != NULL)
+        pq.push({lists[i]->val, lists[i]});
+    }
+    if (pq.size() == 0)
+      return NULL;
+    ListNode *mn = pq.top().second;
+    pq.pop();
+    if (mn->next != NULL)
+      pq.push({mn->next->val, mn->next});
+    ListNode *begin = mn;
+    int flag = 0;
+    while (pq.size())
+    {
+      ListNode *temp = pq.top().second;
+      pq.pop();
+      mn->next = temp;
+      mn = temp;
+      if (temp->next != NULL)
+      {
+        pq.push({temp->next->val, temp->next});
+      }
+    }
+    return begin;
+  }
+};
+// 2nd solution
+// for arrays and lists both
+// merge first 2,then next 2, then next 2 and so on
+// k/2 merges then again do this taking 2-2 at a time then it would be k/4 similarly like this
+// k/2+k/4+k/8.....nklog(k)
+//similar to merge sort on linked list
+ListNode *merging(ListNode *a, ListNode *b)
+{
+        ListNode *l;
+        if (a == NULL)
+                return b;
+        if (b == NULL)
+                return a;
+        if (a->val <= b->val)
+                l = a, a = a->next;
+        else
+                l = b, b = b->next;
+        ListNode *begin = l;
+        while (a != NULL && b != NULL)
+        {
+                if (a->val <= b->val)
+                {
+                        l->next = a;
+                        a = a->next;
+                }
+                else
+                {
+                        l->next = b;
+                        b = b->next;
+                }
+                l = l->next;
+        }
+        if (a == NULL)
+                l->next = b;
+
+        if (b == NULL)
+                l->next = a;
+        return begin;
+}
+ListNode *merging(ListNode *a, ListNode *b)
+{
+        if (a == NULL)
+                return b;
+        if (b == NULL)
+                return a;
+        if (a->val <= b->val)
+        {
+                a->next=merging(a->next,b);
+                return a;
+        }
+         b->next=merging(a,b->next);
+         return b;
+}
+ListNode *merge(int a, int b, vector<ListNode *> &lists)
+{
+        int mid = a + (b - a) / 2;
+        if (b == a)
+                return lists[a];
+        if (a < b)
+        {
+                return merging(merge(a, mid, lists), merge(mid + 1, b, lists));
+        }
+        return NULL;
+}
+class Solution
+{
+public:
+        ListNode *mergeKLists(vector<ListNode *> &lists)
+        {
+                if (lists.size() == 0)
+                        return NULL;
+                if (lists.size() == 1)
+                        return lists[0];
+                return merge(0, lists.size() - 1, lists);
+        }
+};
+
+// finding median in data stream:
+// normal by ordered set using find by order
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+using namespace __gnu_pbds;
+#define ordered_set tree<int, null_type, less_equal<int>, rb_tree_tag, tree_order_statistics_node_update>
+class MedianFinder
+{
+public:
+  ordered_set st;
+  void addNum(int num)
+  {
+    st.insert(num);
+  }
+
+  double findMedian()
+  {
+    if (st.size() % 2)
+      return *st.find_by_order(st.size() / 2);
+
+    int j = *st.find_by_order(st.size() / 2);
+    int k = *st.find_by_order(st.size() / 2 - 1);
+    double c = (j * 1.0 + k * 1.0) / 2.0;
+    return c;
+  }
+};
+// other way is by using min and max heap to store first ceil(n/2) in maxheap and next n/2
+// in minheap and then giving answer acc to it
+priority_queue<int> mxheap;
+priority_queue<int, vector<int>, greater<int>> mnheap;
+double last;
+void addNum(int num)
+{
+  if (mxheap.size() == 0 && mnheap.size() == 0)
+  {
+    mxheap.push(num);
+    last = num;
+  }
+  else if (mxheap.size() == mnheap.size())
+  {
+    if (num <= mxheap.top())
+      mxheap.push(num);
+    else
+    {
+      mnheap.push(num);
+      mxheap.push(mnheap.top());
+      mnheap.pop();
+    }
+    last = mxheap.top();
+  }
+  else
+  {
+    if (num <= mxheap.top())
+    {
+      mnheap.push(mxheap.top());
+      mxheap.pop();
+      mxheap.push(num);
+    }
+    else
+    {
+      mnheap.push(num);
+    }
+    int j = mnheap.top();
+    int k = j + mxheap.top();
+    last = k * 1.0 / 2.0;
+  }
+}
+// FOLLOW UP: IF ALL IN 0 TO 100 THEN JUST FORM A 100 LENGTH ARRAY AND ADD COUNT IN IT AND
+// THEN JUST ITERATE EVERY TIME o(100)==O(1)
+
+// IF 99% IN 0 TO 100 THEN ALSO SAME THING JUST ADD ALL LESS THAN 0 AND THEN PROCEED AS WE
+// APPROX THAT THE MEDIAN WOULD LIE IN 0 TO 100 RANGE ONLY
